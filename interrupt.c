@@ -12,7 +12,7 @@
 Gate idt[IDT_ENTRIES];
 Register    idtR;
 
-int zeos_ticks;
+//int zeos_ticks;
 
 char char_map[] =
 {
@@ -96,25 +96,21 @@ void keyboard_routine() {
 		}
 		printc_xy(65, 22, c);
 	}
-	/*int keyBreak = c/1000000;
-	if(keyBreak == 0) {
-		printc_xy(65,22,char_map[c%1000000]);
-	}
-	else {
-		c = 'C';
-		printc_xy(65, 22, c);
-	}*/
 }
 
 
 void clock_routine()
 {
-	zeos_ticks = zeos_ticks+1;
+	zeos_ticks = zeos_ticks + 1;
 	zeos_show_clock();
 }
 
 void setIdt()
 {
+
+  // Initialize zeos_ticks
+  zeos_ticks = 0;
+
   /* Program interrups/exception service routines */
   idtR.base  = (DWord)idt;
   idtR.limit = IDT_ENTRIES * sizeof(Gate) - 1;

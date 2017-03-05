@@ -49,7 +49,7 @@ int write(int fd, char * buffer, int size)
 	int eax;
 	__asm__("int $0x80 \n\t"
 		: "=a" (eax)
-		: "b" (fd), "c" (buffer), "d" (size));
+		: "b" (fd), "c" (buffer), "d" (size), "a" (4));
 	if (eax < 0) {
 		errno = -eax;
 		return -1;
@@ -61,13 +61,21 @@ int write(int fd, char * buffer, int size)
 int gettime() {
 	int eax;
 	__asm__("int $0x80 \n\t"
-		: "=a" (eax));
+		: "=a" (eax)
+		: "a" (10));
 	if (eax < 0) {
 		errno = -eax;
 		return -1;
 	}
 	errno = 0;
 	return eax;
+}
+
+void perror(char *descr) {
+	if (descr != NULL) {
+		write(1, descr, strlen(descr));
+		write(1, "\n", 1);
+	}
 }
 
 

@@ -19,8 +19,6 @@ unsigned int *p_sys_size = (unsigned int *) KERNEL_START;
 unsigned int *p_usr_size = (unsigned int *) KERNEL_START+1;
 unsigned int *p_rdtr = (unsigned int *) KERNEL_START+2;
 
-int zeos_ticks;
-
 /************************/
 /** Auxiliar functions **/
 /************************/
@@ -62,9 +60,6 @@ inline void set_seg_regs(Word data_sel, Word stack_sel, DWord esp)
 int __attribute__((__section__(".text.main"))) 
   main(void) 
 {
-
-  // Initialize zeos_ticks
-  zeos_ticks = 0;
 
   set_eflags();
 
