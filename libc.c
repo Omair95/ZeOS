@@ -4,6 +4,8 @@
 
 #include <libc.h>
 
+#include <errno.h>
+
 #include <types.h>
 
 int errno;
@@ -46,36 +48,47 @@ int strlen(char *a)
 
 int write(int fd, char * buffer, int size)
 {
-	int eax;
+	int ret;
 	__asm__("int $0x80 \n\t"
-		: "=a" (eax)
+		: "=a" (ret)
 		: "b" (fd), "c" (buffer), "d" (size), "a" (4));
-	if (eax < 0) {
-		errno = -eax;
+	if (ret < 0) {
+		errno = -ret;
 		return -1;
 	}
 	errno = 0;
-	return eax;
+	return ret;
 }
 
 int gettime() {
-	int eax;
+	int ret;
 	__asm__("int $0x80 \n\t"
-		: "=a" (eax)
+		: "=a" (ret)
 		: "a" (10));
-	if (eax < 0) {
-		errno = -eax;
+	if (ret < 0) {
+		errno = -ret;
 		return -1;
 	}
 	errno = 0;
-	return eax;
+	return ret;
 }
 
-void perror(char *descr) {
-	if (descr != NULL) {
+void perror() {
+	char * descr;
+	if (errno < 0) {
+		switch(errno) {
+			case -EPERM: descr = "-1"; break;
+			case -ENOENT: descr = "-1"; break;
+			case -EBADF: descr = "Bad file descriptor"; break;
+			case -EACCES: descr = "Permission denied"; break;
+			case -EINVAL: descr = "Invalid argument"; break;
+			case -ENOSYS: descr = "Function not implemented"; break;
+			default: descr = "Unknown error"; break;
+	 	}	
 		write(1, descr, strlen(descr));
 		write(1, "\n", 1);
 	}
 }
+
 
 

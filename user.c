@@ -46,8 +46,8 @@ int __attribute__ ((__section__(".text.main")))
   acum = outer(count); 
   int result = add(2,3); */
 
-  int w = write(1, "Hello", 8);
-  if (w == -1) perror("Error en write");
+  int w = write(1, "Hello", 5);
+  if (w == -1) perror();
 
   int time;
   char timestring[25];
@@ -58,6 +58,6 @@ int __attribute__ ((__section__(".text.main")))
     w = write(1, "Time: ", 6);
     itoa(time,timestring);
     w = write(1, timestring, strlen(timestring));
-    if (w == -1) perror("Error en write");
+    if (w == -1) perror();
   }
 }
