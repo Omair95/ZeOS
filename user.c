@@ -3,7 +3,7 @@
 char buff[24];
 
 int pid;
-
+// algo
 int add(int par1, int par2)
 {
     int result;
