@@ -60,6 +60,22 @@ inline void set_seg_regs(Word data_sel, Word stack_sel, DWord esp)
 int __attribute__((__section__(".text.main"))) 
   main(void) 
 {
+  struct list_head freequeue;
+  INIT_LIST_HEAD(&freequeue);
+  int i;
+/*
+  for(i = 0; i <= 0; i++) {
+         //struct task_struct result;
+		 //result  = *list_head_to_task_struct(&task[i].task.list);
+
+		 list_add(&task[i].task.list, &freequeue);
+
+  }*/
+  struct list_head readyqueue;
+  INIT_LIST_HEAD(&readyqueue);
+
+
+
 
   set_eflags();
 

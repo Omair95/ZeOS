@@ -14,9 +14,12 @@
 
 enum state_t { ST_RUN, ST_READY, ST_BLOCKED };
 
+//struct list_head Freequeue;
+
 struct task_struct {
   int PID;			/* Process ID. This MUST be the first field of the struct. */
   page_table_entry * dir_pages_baseAddr;
+  struct list_head *list; 
 };
 
 union task_union {
