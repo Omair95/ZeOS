@@ -46,16 +46,13 @@ int __attribute__ ((__section__(".text.main")))
   acum = outer(count); 
   int result = add(2,3); */
 
-  int w = write(1, "Hello", 5);
-  if (w == -1) perror();
-
   int time;
   char timestring[25];
   
   while(1) {
     write(1, "\n", 1);
     time = gettime();
-    w = write(1, "Time: ", 6);
+    int w = write(1, "Time: ", 6);
     itoa(time,timestring);
     w = write(1, timestring, strlen(timestring));
     if (w == -1) perror();

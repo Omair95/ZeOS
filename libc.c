@@ -90,5 +90,15 @@ void perror() {
 	}
 }
 
+int getpid(void) 
+{
+	
+}
+
+int fork(void)
+{
+
+}
+
 
 

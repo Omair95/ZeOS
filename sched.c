@@ -6,6 +6,7 @@
 #include <mm.h>
 #include <io.h>
 
+
 /**
  * Container for the Task array and 2 additional pages (the first and the last one)
  * to protect against out of bound accesses.
@@ -15,12 +16,14 @@ union task_union protected_tasks[NR_TASKS+2]
 
 union task_union *task = &protected_tasks[1]; /* == union task_union task[NR_TASKS] */
 
-#if 0
 struct task_struct *list_head_to_task_struct(struct list_head *l)
 {
-  return list_entry( l, struct task_struct, list);
+  //return list_entry( l, struct task_struct, list);
+  int dir = &l;
+  return (struct task_struct*)(dir&0xfffff000);
 }
-#endif
+
+struct task_struct * idle_task;
 
 extern struct list_head blocked;
 
@@ -61,16 +64,42 @@ void cpu_idle(void)
 
 void init_idle (void)
 {
+  idle_task = list_head_to_task_struct(list_first(&freequeue));
+  //list_del(list_first(&freequeue));
+  union task_union *idle_union = (union task_union*) idle_task;
 
+  idle_task->PID = 0;
+  allocate_DIR(idle_task);
+  //Punto 4: Inicialitzar contexto para el proceso para restaurarlo cuando se le asigna cpu.
+  idle_union->stack[1023] = (unsigned long)&cpu_idle;
+  idle_union->stack[1022] = 0;
+  idle_union->task.initial_ebp = &idle_union->stack[1022];
+  sys_write(1, "HOLA", 4);
+  cpu_idle();
 }
 
 void init_task1(void)
 {
+   struct task_struct *init = list_head_to_task_struct(list_first(&freequeue));
+   //list_del(list_first(&freequeue));
+   union task_union *init_union = (union task_union*) init;
+   init->PID = 1;
+   allocate_DIR	(init);
+   set_user_pages(&init_union->task);
+   TSS.esp0 = init_union->stack[1024]; //Update TSS
+   page_table_entry * dir_task1 = get_DIR(&init_union->task);	
+   set_cr3(dir_task1);
 }
 
 
 void init_sched(){
-
+  INIT_LIST_HEAD(&freequeue);
+    
+  int i;
+  for(i = 0; i < NR_TASKS; i++) {
+	list_add(&task[i].task.list, &freequeue);
+  }
+  INIT_LIST_HEAD(&readyqueue);
 }
 
 struct task_struct* current()
@@ -84,3 +113,14 @@ struct task_struct* current()
   return (struct task_struct*)(ret_value&0xfffff000);
 }
 
+
+void inner_task_switch(union task_union *new) {
+
+}
+
+
+void task_switch(union task_union *new) {
+
+  inner_task_switch(new);
+
+}

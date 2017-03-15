@@ -11,7 +11,7 @@
 #include <mm.h>
 #include <io.h>
 #include <utils.h>
-#include <zeos_mm.h> /* TO BE DELETED WHEN ADDED THE PROCESS MANAGEMENT CODE TO BECOME MULTIPROCESS */
+//#include <zeos_mm.h> /* TO BE DELETED WHEN ADDED THE PROCESS MANAGEMENT CODE TO BECOME MULTIPROCESS */
 
 
 int (*usr_main)(void) = (void *) PH_USER_START;
@@ -60,22 +60,6 @@ inline void set_seg_regs(Word data_sel, Word stack_sel, DWord esp)
 int __attribute__((__section__(".text.main"))) 
   main(void) 
 {
-  struct list_head freequeue;
-  INIT_LIST_HEAD(&freequeue);
-  int i;
-/*
-  for(i = 0; i <= 0; i++) {
-         //struct task_struct result;
-		 //result  = *list_head_to_task_struct(&task[i].task.list);
-
-		 list_add(&task[i].task.list, &freequeue);
-
-  }*/
-  struct list_head readyqueue;
-  INIT_LIST_HEAD(&readyqueue);
-
-
-
 
   set_eflags();
 
@@ -98,7 +82,7 @@ int __attribute__((__section__(".text.main")))
 
 /* Initialize an address space to be used for the monoprocess version of ZeOS */
 
-  monoprocess_init_addr_space(); /* TO BE DELETED WHEN ADDED THE PROCESS MANAGEMENT CODE TO BECOME MULTIPROCESS */
+  //monoprocess_init_addr_space(); /* TO BE DELETED WHEN ADDED THE PROCESS MANAGEMENT CODE TO BECOME MULTIPROCESS */
 
   /* Initialize Scheduling */
   init_sched();
@@ -106,7 +90,9 @@ int __attribute__((__section__(".text.main")))
   /* Initialize idle task  data */
   init_idle();
   /* Initialize task 1 data */
-  init_task1();
+   init_task1();
+
+  /* Perform task switch for testing purposes only */
 
   /* Move user code/data now (after the page table initialization) */
   copy_data((void *) KERNEL_START + *p_sys_size, usr_main, *p_usr_size);
