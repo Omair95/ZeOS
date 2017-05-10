@@ -4,8 +4,6 @@
 
 #include <libc.h>
 
-#include <errno.h>
-
 #include <types.h>
 
 int errno;
@@ -45,60 +43,103 @@ int strlen(char *a)
   return i;
 }
 
-
-int write(int fd, char * buffer, int size)
+void perror()
 {
-	int ret;
-	__asm__("int $0x80 \n\t"
-		: "=a" (ret)
-		: "b" (fd), "c" (buffer), "d" (size), "a" (4));
-	if (ret < 0) {
-		errno = -ret;
-		return -1;
-	}
-	errno = 0;
-	return ret;
+  char buffer[256];
+
+  itoa(errno, buffer);
+
+  write(1, buffer, strlen(buffer));
 }
 
-int gettime() {
-	int ret;
-	__asm__("int $0x80 \n\t"
-		: "=a" (ret)
-		: "a" (10));
-	if (ret < 0) {
-		errno = -ret;
-		return -1;
-	}
-	errno = 0;
-	return ret;
-}
-
-void perror() {
-	char * descr;
-	if (errno < 0) {
-		switch(errno) {
-			case -EPERM: descr = "-1"; break;
-			case -ENOENT: descr = "-1"; break;
-			case -EBADF: descr = "Bad file descriptor"; break;
-			case -EACCES: descr = "Permission denied"; break;
-			case -EINVAL: descr = "Invalid argument"; break;
-			case -ENOSYS: descr = "Function not implemented"; break;
-			default: descr = "Unknown error"; break;
-	 	}	
-		write(1, descr, strlen(descr));
-		write(1, "\n", 1);
-	}
-}
-
-int getpid(void) 
+int write(int fd, char *buffer, int size)
 {
-	
+  int result;
+  
+  __asm__ __volatile__ (
+	"int $0x80\n\t"
+	: "=a" (result)
+	: "a" (4), "b" (fd), "c" (buffer), "d" (size));
+  if (result<0)
+  {
+    errno = -result;
+    return -1;
+  }
+  errno=0;
+  return result;
 }
-
-int fork(void)
+ 
+int gettime()
 {
-
+  int result;
+  
+  __asm__ __volatile__ (
+	"int $0x80\n\t"
+	:"=a" (result)
+	:"a" (10) );
+  errno=0;
+  return result;
 }
 
+int getpid()
+{
+  int result;
+  
+  __asm__ __volatile__ (
+  	"int $0x80\n\t"
+	:"=a" (result)
+	:"a" (20) );
+  errno=0;
+  return result;
+}
 
+int fork()
+{
+  int result;
+  
+  __asm__ __volatile__ (
+  	"int $0x80\n\t"
+	:"=a" (result)
+	:"a" (2) );
+  if (result<0)
+  {
+    errno = -result;
+    return -1;
+  }
+  errno=0;
+  return result;
+}
 
+void exit(void)
+{
+  __asm__ __volatile__ (
+  	"int $0x80\n\t"
+	:
+	:"a" (1) );
+}
+
+int yield()
+{
+  int result;
+  __asm__ __volatile__ (
+  	"int $0x80\n\t"
+	:"=a" (result)
+	:"a" (13) );
+  return result;
+}
+
+int get_stats(int pid, struct stats *st)
+{
+  int result;
+  __asm__ __volatile__ (
+  	"int $0x80\n\t"
+	:"=a" (result)
+	:"a" (35), "b" (pid), "c" (st) );
+  if (result<0)
+  {
+    errno = -result;
+    return -1;
+  }
+  errno=0;
+  return result;
+}
